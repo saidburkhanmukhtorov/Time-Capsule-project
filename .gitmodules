@@ -1,0 +1,15 @@
+[submodule "Auth-Servic-Timecapsule"]
+	path = Auth-Servic-Timecapsule
+	url = git@github.com:saidburkhanmukhtorov/Auth-Servic-Timecapsule.git
+[submodule "Timeline-Service"]
+	path = Timeline-Service
+	url = git@github.com:saidburkhanmukhtorov/Timeline-Service.git
+[submodule "memory-service"]
+	path = memory-service
+	url = git@github.com:saidburkhanmukhtorov/memory-service.git
+[submodule "Api-Gateway-Timecapsule"]
+	path = Api-Gateway-Timecapsule
+	url = git@github.com:saidburkhanmukhtorov/Api-Gateway-Timecapsule.git
+[submodule "submodule-for-timecapsule"]
+	path = submodule-for-timecapsule
+	url = git@github.com:saidburkhanmukhtorov/submodule-for-timecapsule.git
