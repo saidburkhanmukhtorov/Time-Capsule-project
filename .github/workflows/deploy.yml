@@ -13,14 +13,22 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v3
 
+      - name: Verify Connection Details
+        run: |
+          echo "Connecting to host: ${{ secrets.LIGHTSAIL_HOST }}"
+          echo "Using user: ${{ secrets.LIGHTSAIL_USER }}"
+        # Do not print sensitive information such as the SSH key!
+
       - name: Deploy to Lightsail
         uses: appleboy/ssh-action@v0.1.1
         with:
           host: ${{ secrets.LIGHTSAIL_HOST }}
-          username: ${{ secrets.LIGHTSAIL_USER }} # Ensure this is set to 'ubuntu'
+          username: ${{ secrets.LIGHTSAIL_USER }}
           key: ${{ secrets.LIGHTSAIL_SSH_KEY }}
           port: 22
           script: |
+            echo "Starting deployment..."
             cd /home/ubuntu/Time-Capsule-project
             sudo docker compose down
             sudo docker compose up -d --build
+            echo "Deployment complete."
