@@ -30,6 +30,99 @@ jobs:
             sudo docker compose down
             # Build and start main service
             sudo docker compose up -d --build
+
+            # Creating topics for kafka
+            sudo docker exec -it kafka bash
+            # Create milestone_topic
+            /opt/kafka/bin/kafka-topics.sh --bootstrap-server localhost:9092 --create --topic milestone_topic --partitions 1 --replication-factor 1
+            # Create memory_topic
+            /opt/kafka/bin/kafka-topics.sh --bootstrap-server localhost:9092 --create --topic memory_topic --partitions 1 --replication-factor 1
+            # Create comment_topic
+            /opt/kafka/bin/kafka-topics.sh --bootstrap-server localhost:9092 --create --topic comment_topic --partitions 1 --replication-factor 1
+            # Create custom_event_topic
+            /opt/kafka/bin/kafka-topics.sh --bootstrap-server localhost:9092 --create --topic custom_event_topic --partitions 1 --replication-factor 1
+            # Create historical_event_topic
+            /opt/kafka/bin/kafka-topics.sh --bootstrap-server localhost:9092 --create --topic historical_event_topic --partitions 1 --replication-factor 1
+            # Create media_topic
+            /opt/kafka/bin/kafka-topics.sh --bootstrap-server localhost:9092 --create --topic media_topic --partitions 1 --replication-factor 1
+            exit
+
+            # creating postgres tables
+            docker exec -it postgres_dock psql -U postgres -d memory
+            -- Create the "users" table
+            CREATE TABLE users (
+                id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+                username VARCHAR(50) UNIQUE NOT NULL,
+                email VARCHAR(100) UNIQUE NOT NULL,
+                password_hash VARCHAR(255) NOT NULL,
+                full_name VARCHAR(100),
+                date_of_birth DATE,
+                role VARCHAR(20) NOT NULL DEFAULT 'user',
+                created_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP,
+                updated_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP
+            );
+
+            -- Create the "memories" table
+            CREATE TABLE memories (
+                id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+                user_id UUID NOT NULL,
+                title VARCHAR(255) NOT NULL,
+                description TEXT,
+                date TIMESTAMP WITH TIME ZONE NOT NULL,
+                tags TEXT[],
+                latitude NUMERIC(9,6),
+                longitude NUMERIC(9,6),
+                place_name VARCHAR(255),
+                privacy VARCHAR(20) NOT NULL,
+                created_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP,
+                FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE
+            );
+
+            -- Create the "media" table
+            CREATE TABLE media (
+                id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+                memory_id UUID,
+                type VARCHAR(10) NOT NULL,
+                url VARCHAR(255) NOT NULL,
+                created_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP,
+                FOREIGN KEY (memory_id) REFERENCES memories(id) ON DELETE CASCADE
+            );
+
+            -- Create the "comments" table
+            CREATE TABLE comments (
+                id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+                memory_id UUID,
+                user_id UUID NOT NULL,
+                content TEXT NOT NULL,
+                created_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP,
+                FOREIGN KEY (memory_id) REFERENCES memories(id) ON DELETE CASCADE,
+                FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE
+            );
+
+            -- Create the "milestones" table
+            CREATE TABLE milestones (
+                id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+                user_id UUID NOT NULL,
+                title VARCHAR(255) NOT NULL,
+                date TIMESTAMP WITH TIME ZONE NOT NULL,
+                category VARCHAR(50),
+                created_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP,
+                FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE
+            );
+
+            -- Create the "custom_events" table
+            CREATE TABLE custom_events (
+                id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+                user_id UUID NOT NULL,
+                title VARCHAR(255) NOT NULL,
+                description TEXT,
+                date TIMESTAMP WITH TIME ZONE NOT NULL,
+                category VARCHAR(50),
+                created_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP,
+                FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE
+            );
+            exit
+
             cd memory-service
             sudo docker compose up -d --build
             # Navigate to the main project directory
