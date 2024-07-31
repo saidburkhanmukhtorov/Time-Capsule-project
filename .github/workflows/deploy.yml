@@ -1,11 +1,14 @@
 name: Deploy to Lightsail
+
 on:
   push:
     branches:
       - main
+
 jobs:
   deploy:
     runs-on: ubuntu-latest
+
     steps:
       - name: Checkout code
         uses: actions/checkout@v3
@@ -14,7 +17,6 @@ jobs:
         run: |
           echo "Connecting to host: ${{ secrets.LIGHTSAIL_HOST }}"
           echo "Using user: ${{ secrets.LIGHTSAIL_USER }}"
-        # Do not print sensitive information such as the SSH key!
 
       - name: Deploy to Lightsail
         uses: appleboy/ssh-action@master
@@ -27,9 +29,29 @@ jobs:
           script: |
             echo "Starting deployment..."
             cd /home/ubuntu/Time-Capsule-project
-            sudo docker compose down
-            sudo docker compose up -d --build
+
+            # Bring down any existing services
+            sudo docker-compose down
+
+            # Navigate and bring up services in the specified order
+            echo "Deploying memory service..."
+            cd memory-service
+            sudo docker-compose up -d --build
+
+            echo "Deploying timeline service..."
+            cd ../Timeline-Service
+            sudo docker-compose up -d --build
+
+            echo "Deploying API gateway..."
+            cd ../Api-Gateway-Timecapsule
+            sudo docker-compose up -d --build
+
+            echo "Deploying auth service..."
+            cd ../Auth-Service-Timecapsule
+            sudo docker-compose up -d --build
+
             echo "Deployment complete."
+
         env:
           LIGHTSAIL_HOST: ${{ secrets.LIGHTSAIL_HOST }}
           LIGHTSAIL_USER: ${{ secrets.LIGHTSAIL_USER }}
