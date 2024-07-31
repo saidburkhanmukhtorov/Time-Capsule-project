@@ -1,14 +1,11 @@
 name: Deploy to Lightsail
-
 on:
   push:
     branches:
       - main
-
 jobs:
   deploy:
     runs-on: ubuntu-latest
-
     steps:
       - name: Checkout code
         uses: actions/checkout@v3
@@ -20,11 +17,12 @@ jobs:
         # Do not print sensitive information such as the SSH key!
 
       - name: Deploy to Lightsail
-        uses: appleboy/ssh-action@v0.1.1
+        uses: appleboy/ssh-action@master
         with:
           host: ${{ secrets.LIGHTSAIL_HOST }}
           username: ${{ secrets.LIGHTSAIL_USER }}
           key: ${{ secrets.LIGHTSAIL_SSH_KEY }}
+          key_format: pem
           port: 22
           script: |
             echo "Starting deployment..."
@@ -32,3 +30,23 @@ jobs:
             sudo docker compose down
             sudo docker compose up -d --build
             echo "Deployment complete."
+        env:
+          LIGHTSAIL_HOST: ${{ secrets.LIGHTSAIL_HOST }}
+          LIGHTSAIL_USER: ${{ secrets.LIGHTSAIL_USER }}
+          LIGHTSAIL_SSH_KEY: ${{ secrets.LIGHTSAIL_SSH_KEY }}
+
+      - name: Debug SSH Connection
+        if: failure()
+        uses: appleboy/ssh-action@master
+        with:
+          host: ${{ secrets.LIGHTSAIL_HOST }}
+          username: ${{ secrets.LIGHTSAIL_USER }}
+          key: ${{ secrets.LIGHTSAIL_SSH_KEY }}
+          key_format: pem
+          port: 22
+          script: |
+            echo "Debug: Testing SSH connection"
+            whoami
+            pwd
+            ls -la
+          debug: true
