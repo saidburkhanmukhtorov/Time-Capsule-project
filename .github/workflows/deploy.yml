@@ -33,18 +33,20 @@ jobs:
 
             # Creating topics for kafka
             sudo docker exec -it kafka bash
+
             # Create milestone_topic
-            /opt/kafka/bin/kafka-topics.sh --bootstrap-server localhost:9092 --create --topic milestone_topic --partitions 1 --replication-factor 1
+            kafka-topics.sh --bootstrap-server localhost:9092 --create --topic milestone_topic --partitions 1 --replication-factor 1
             # Create memory_topic
-            /opt/kafka/bin/kafka-topics.sh --bootstrap-server localhost:9092 --create --topic memory_topic --partitions 1 --replication-factor 1
+            kafka-topics.sh --bootstrap-server localhost:9092 --create --topic memory_topic --partitions 1 --replication-factor 1
             # Create comment_topic
-            /opt/kafka/bin/kafka-topics.sh --bootstrap-server localhost:9092 --create --topic comment_topic --partitions 1 --replication-factor 1
+            kafka-topics.sh --bootstrap-server localhost:9092 --create --topic comment_topic --partitions 1 --replication-factor 1
             # Create custom_event_topic
-            /opt/kafka/bin/kafka-topics.sh --bootstrap-server localhost:9092 --create --topic custom_event_topic --partitions 1 --replication-factor 1
+            kafka-topics.sh --bootstrap-server localhost:9092 --create --topic custom_event_topic --partitions 1 --replication-factor 1
             # Create historical_event_topic
-            /opt/kafka/bin/kafka-topics.sh --bootstrap-server localhost:9092 --create --topic historical_event_topic --partitions 1 --replication-factor 1
+            kafka-topics.sh --bootstrap-server localhost:9092 --create --topic historical_event_topic --partitions 1 --replication-factor 1
             # Create media_topic
-            /opt/kafka/bin/kafka-topics.sh --bootstrap-server localhost:9092 --create --topic media_topic --partitions 1 --replication-factor 1
+            kafka-topics.sh --bootstrap-server localhost:9092 --create --topic media_topic --partitions 1 --replication-factor 1
+
             exit
 
             # creating postgres tables
